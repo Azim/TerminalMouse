@@ -40,20 +40,34 @@ namespace TerminalMouse
             wasVisible = Cursor.visible;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+
+            if (StartOfRound.Instance.localPlayerController != null)
+            {
+                StartOfRound.Instance.localPlayerController.disableLookInput = true;
+            }
         }
         private void Terminal_QuitTerminal(On.Terminal.orig_QuitTerminal orig, Terminal self)
         {
             orig(self);
             Cursor.lockState = locked;
             Cursor.visible = wasVisible;
+
+            if (StartOfRound.Instance.localPlayerController != null)
+            {
+                StartOfRound.Instance.localPlayerController.disableLookInput = false;
+            }
         }
         private void PlayerControllerB_KillPlayer(On.GameNetcodeStuff.PlayerControllerB.orig_KillPlayer orig, GameNetcodeStuff.PlayerControllerB self, Vector3 bodyVelocity, bool spawnBody, CauseOfDeath causeOfDeath, int deathAnimation)
         {
             orig(self, bodyVelocity, spawnBody, causeOfDeath, deathAnimation);
-            if (self.IsLocalPlayer)
+            
+            if (!self.IsLocalPlayer) return;
+
+            Cursor.lockState = locked;
+            Cursor.visible = wasVisible;
+            if (StartOfRound.Instance.localPlayerController != null)
             {
-                Cursor.lockState = locked;
-                Cursor.visible = wasVisible;
+                StartOfRound.Instance.localPlayerController.disableLookInput = false;
             }
         }
     }
